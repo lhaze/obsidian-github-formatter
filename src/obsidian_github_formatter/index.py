@@ -6,8 +6,8 @@ from pathlib import Path
 
 
 class TreeElements(Enum):
-    space = "    "
-    branch = "│   "
+    space = ". . "
+    branch = "│ . "
     tee = "├── "
     last = "└── "
 
@@ -102,7 +102,7 @@ class Index:
 
 
 def render_doc_link(path: Path) -> str:
-    if " " in path.name:
+    if " " in str(path):
         return f"[{path.name}](<{str(path)}>)"
     return f"[{path.name}]({str(path)})"
 
