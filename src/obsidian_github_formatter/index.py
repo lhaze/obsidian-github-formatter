@@ -77,7 +77,7 @@ class Index:
         dir_path = Path(dir_path)
         summary = defaultdict(int)
 
-        def inner(dir_path: Path, prefix: t.Sequence[TreeElements] = ()) -> t.Tuple[t.Sequence[TreeElements], Path]:
+        def inner(dir_path: Path, prefix: t.Tuple[TreeElements, ...] = ()) -> t.Generator[IndexLine, None, None]:
             nonlocal summary
             contents = list(dir_path.iterdir())
             elements = [TreeElements.tee] * (len(contents) - 1) + [TreeElements.last]
