@@ -8,6 +8,8 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.8"
+colorama = "^0.4.6"
+click = "^8.1.4"
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.5.0"
@@ -17,6 +19,9 @@ pytest-cov = "^3.0.0"
 pdbpp = "^0.10.3"
 flake8 = "^5.0.4"
 black = {version = "^22.8.0", allow-prereleases = true}
+
+[tool.poetry.scripts]
+ogf = 'obsidian_github_formatter.markdown:_main'
 
 [build-system]
 requires = ["poetry-core"]

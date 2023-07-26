@@ -31,9 +31,10 @@ def test_index() -> None:
             ". . │ . ├──  baz.txt",
             ". . │ . ├──  other baz.png",
             ". . │ . └──  baz.jpg",
-            ". . └──  bar_file.md",
+            ". . ├──  bar_file.md",
+            ". . └──  foo.md",
             "",
-            "{'directories': 3, 'markdown': 3, 'other': 1, 'image': 2}",
+            "{'directories': 3, 'markdown': 4, 'other': 1, 'image': 2}",
         )
     )
 
@@ -46,8 +47,8 @@ def test_index() -> None:
     ],
 )
 def test_render_doc_link(path: str, expected: str) -> None:
-    path = Path(path)
-    assert render_doc_link(path) == expected
+    path_ = Path(path)
+    assert render_doc_link(path_) == expected
 
 
 @pytest.mark.parametrize(
@@ -112,14 +113,15 @@ def test_build_index() -> None:
             ". . │ . ├── [baz.txt](<bar/bar baz/baz.txt>)",
             ". . │ . ├── [other baz.png](<bar/bar baz/other baz.png>)",
             ". . │ . └── [baz.jpg](<bar/bar baz/baz.jpg>)",
-            ". . └── [bar_file.md](bar/bar_file.md)",
+            ". . ├── [bar_file.md](bar/bar_file.md)",
+            ". . └── [foo.md](bar/foo.md)",
             "",
             "## Summary",
             "",
             "| File Format | Count |",
             "| :---        |  ---: |",
             "| directories | 3 |",
-            "| markdown | 3 |",
+            "| markdown | 4 |",
             "| image | 2 |",
             "| audio | 0 |",
             "| video | 0 |",
@@ -128,5 +130,19 @@ def test_build_index() -> None:
             "",
         )
     )
-    actual = build_index(_test_stub_path)
+    actual = build_index(str(_test_stub_path))
     assert actual == expected
+
+
+def test_file_map() -> None:
+    assert Index.create(_test_stub_path).file_map == {
+        "OTHER FOO": [Path("foo/OTHER FOO.md")],
+        "OTHER FOO.md": [Path("foo/OTHER FOO.md")],
+        "bar_file": [Path("bar/bar_file.md")],
+        "bar_file.md": [Path("bar/bar_file.md")],
+        "baz.jpg": [Path("bar/bar baz/baz.jpg")],
+        "baz.txt": [Path("bar/bar baz/baz.txt")],
+        "foo": [Path("foo/foo.md"), Path("bar/foo.md")],
+        "foo.md": [Path("foo/foo.md"), Path("bar/foo.md")],
+        "other baz.png": [Path("bar/bar baz/other baz.png")],
+    }

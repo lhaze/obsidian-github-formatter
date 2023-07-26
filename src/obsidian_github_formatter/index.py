@@ -16,7 +16,6 @@ class TreeElements(Enum):
 
 
 class FileFormat(Enum):
-
     directory = "directories"
     markdown = "markdown"
     image = "image"
@@ -26,7 +25,7 @@ class FileFormat(Enum):
     other = "other"
 
     @classmethod
-    def from_extension(cls, extension: str) -> t.Optional["FileFormat"]:
+    def from_extension(cls, extension: t.Optional[str]) -> t.Optional["FileFormat"]:
         map = {
             ".3gp": cls.audio,
             ".bmp": cls.image,
@@ -48,12 +47,12 @@ class FileFormat(Enum):
             ".wav": cls.audio,
             ".webm": cls.video,
         }
-        return map.get(extension.lower(), cls.other)
+        return map.get((extension or "").lower(), cls.other)
 
 
 @dataclass(frozen=True)
 class IndexLine:
-    elements: t.Tuple[TreeElements]
+    elements: t.Tuple[TreeElements, ...]
     path: Path
 
     def __repr__(self) -> str:
@@ -61,12 +60,38 @@ class IndexLine:
 
 
 Summary = t.DefaultDict[FileFormat, int]
+FileMap = t.Dict[str, t.List[Path]]
+
+
+def _iterate_file_names(filepath: Path) -> t.Generator[str, None, None]:
+    yield filepath.name
+    if filepath.suffix.lower() == ".md":
+        yield filepath.stem
+
+
+def _walk_path_tree(
+    root: Path, current: Path, summary: Summary, file_map: FileMap, prefix: t.Tuple[TreeElements, ...] = ()
+) -> t.Generator[IndexLine, None, None]:
+    contents = list(current.iterdir())
+    elements = [TreeElements.tee] * (len(contents) - 1) + [TreeElements.last]
+    for element, path in zip(elements, contents):
+        if path.is_dir():
+            yield IndexLine(prefix + (element,), path)
+            summary[FileFormat.directory] += 1
+            extension = TreeElements.branch if element == TreeElements.tee else TreeElements.space
+            yield from _walk_path_tree(root, path, summary=summary, file_map=file_map, prefix=prefix + (extension,))
+        else:
+            yield IndexLine(prefix + (element,), path)
+            for file_name in _iterate_file_names(path):
+                file_map[file_name].append(path.relative_to(root))
+            summary[FileFormat.from_extension(path.suffix)] += 1  # type: ignore
 
 
 @dataclass(frozen=True)
 class Index:
     root: Path
     lines: t.Tuple[IndexLine]
+    file_map: FileMap
     summary: Summary
 
     @classmethod
@@ -76,22 +101,14 @@ class Index:
     ) -> "Index":
         dir_path = Path(dir_path)
         summary = defaultdict(int)
+        file_map = defaultdict(list)
 
-        def inner(dir_path: Path, prefix: t.Tuple[TreeElements, ...] = ()) -> t.Generator[IndexLine, None, None]:
-            nonlocal summary
-            contents = list(dir_path.iterdir())
-            elements = [TreeElements.tee] * (len(contents) - 1) + [TreeElements.last]
-            for element, path in zip(elements, contents):
-                if path.is_dir():
-                    yield IndexLine(prefix + (element,), path)
-                    summary[FileFormat.directory] += 1
-                    extension = TreeElements.branch if element == TreeElements.tee else TreeElements.space
-                    yield from inner(path, prefix=prefix + (extension,))
-                else:
-                    yield IndexLine(prefix + (element,), path)
-                    summary[FileFormat.from_extension(path.suffix)] += 1
-
-        return cls(root=dir_path, lines=tuple(inner(dir_path)), summary=summary)
+        return cls(
+            root=dir_path,
+            lines=tuple(_walk_path_tree(dir_path, dir_path, summary, file_map)),
+            summary=summary,
+            file_map=file_map,
+        )
 
     def __repr__(self) -> str:
         return (
