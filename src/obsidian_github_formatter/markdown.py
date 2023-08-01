@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import difflib
 import os
 import shutil
@@ -20,12 +21,12 @@ def process_file(filename: str, index: Index, dry_run: bool = False, make_backup
         if not dry_run:
             _save_file(filename, formatted_text, make_backups=make_backups)
         else:
-            print(color_header(f"File {filename} would be modified. Here's the diff:"))
+            _print(color_header(f"File '{filename}' would be modified. Here's the diff:"))
             diff = difflib.unified_diff(original_text.splitlines(), formatted_text.splitlines())
-            print("\n".join(color_diff(diff)))
+            _print("\n".join(color_diff(diff)))
 
 
-def _read_file(filename: str) -> str:
+def _read_file(filename: str) -> str:  # pragma: no cover
     with open(filename, "r") as f:
         return f.read()
 
@@ -33,11 +34,15 @@ def _read_file(filename: str) -> str:
 _BACKUP_EXTENSION = "~"
 
 
-def _save_file(filename: str, contents: str, make_backups: bool = False) -> None:
+def _save_file(filename: str, contents: str, make_backups: bool = False) -> None:  # pragma: no cover
     if make_backups:
         shutil.copyfile(filename, f"{filename}.{_BACKUP_EXTENSION}")
     with open(filename, "w") as f:
         f.write(contents)
+
+
+def _print(text: str) -> None:  # pragma: no cover
+    print(color_header(text))
 
 
 def format_markdown(contents: str, index: Index) -> str:
@@ -54,7 +59,7 @@ def format_markdown(contents: str, index: Index) -> str:
     help="Root of the repo.",
 )
 @click.argument("filenames", nargs=-1, type=click.Path(exists=True))
-def _main(dry_run: bool, make_backups: bool, root: str, filenames: t.List[str]) -> None:
+def _main(dry_run: bool, make_backups: bool, root: str, filenames: t.List[str]) -> None:  # pragma: no cover
     index = Index.create(dir_path=root)
     for filename in filenames:
         process_file(filename, index, dry_run=dry_run, make_backups=make_backups)
