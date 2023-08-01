@@ -1,0 +1,6 @@
+-   id: obsidian-github-formatter
+    name: Repository formatter for matchinig Obsidian Vault and GitHub Web browser.
+    entry: ogf
+    language: python
+    files: \.md$
+    types: [file]

@@ -1,9 +1,0 @@
-repos:
--   repo: local
-    hooks:
-    -   id: obsidian-github-formatter
-        name: Repository formatter for matchinig Obsidian Vault and GitHub Web browser.
-        entry: python precommit_hook_markdown.py
-        language: python
-        files: \.md$
-        types: [file]

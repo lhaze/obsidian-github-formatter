@@ -59,11 +59,11 @@ def format_markdown(contents: str, index: Index) -> str:
     help="Root of the repo.",
 )
 @click.argument("filenames", nargs=-1, type=click.Path(exists=True))
-def _main(dry_run: bool, make_backups: bool, root: str, filenames: t.List[str]) -> None:  # pragma: no cover
+def main(dry_run: bool, make_backups: bool, root: str, filenames: t.List[str]) -> None:  # pragma: no cover
     index = Index.create(dir_path=root)
     for filename in filenames:
         process_file(filename, index, dry_run=dry_run, make_backups=make_backups)
 
 
 if __name__ == "__main__":
-    _main()  # type: ignore
+    main()  # type: ignore
