@@ -19,7 +19,7 @@ def test_process_file_wet_run(_save_file: mock.MagicMock, _read_file: mock.Magic
         "\n".join(
             (
                 "FOO BAR",
-                "foo [OTHER FOO](/foo/OTHER FOO.md) bar!",
+                "foo [OTHER FOO](</foo/OTHER FOO.md>) bar!",
             )
         ),
         make_backups=False,
@@ -48,7 +48,7 @@ def test_process_file_dry_run(_print: mock.MagicMock, _read_file: mock.MagicMock
                 "",
                 "\x1b[39m FOO BAR",
                 "\x1b[31m-foo [[OTHER FOO]] bar!",
-                "\x1b[32m+foo [OTHER FOO](/foo/OTHER FOO.md) bar!",
+                "\x1b[32m+foo [OTHER FOO](</foo/OTHER FOO.md>) bar!",
             )
         ),
     )

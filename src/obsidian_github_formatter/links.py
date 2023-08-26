@@ -9,6 +9,7 @@ def repair_links(contents: str, index: Index, prefix: str = "") -> str:
 
 
 def substitute_wikilink_format(contents: str, index: Index, prefix: str = "") -> str:
+    bracket_L = bracket_R = ""
     link = contents.strip("[]")
     if "|" in contents:
         title, link = link.rsplit("|", 1)
@@ -20,7 +21,9 @@ def substitute_wikilink_format(contents: str, index: Index, prefix: str = "") ->
     if len(paths) > 1:
         raise ValueError(f"More than one file identifies as '{link}': {[str(p) for p in paths]}")  # pragma: no cover
     path = str(paths[0])
-    if title:
-        return f"[{title}]({prefix}/{path})"
-    else:
-        return f"[{link}]({prefix}/{path})"
+    if " " in path or " " in prefix:
+        bracket_L = "<"
+        bracket_R = ">"
+    if title is None:
+        title = link
+    return f"[{title}]({bracket_L}{prefix}/{path}{bracket_R})"

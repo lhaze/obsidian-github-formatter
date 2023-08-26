@@ -1,5 +1,3 @@
-import pytest
-
 from obsidian_github_formatter.index import Index
 from obsidian_github_formatter.links import (
     repair_links,
@@ -8,21 +6,17 @@ from obsidian_github_formatter.links import (
 
 
 class TestSubstituteWikilinkFormat:
-    @pytest.mark.parametrize(
-        ("wikilink", "expected_link"),
-        [
-            ("[[OTHER FOO]]", "[OTHER FOO](/foo/OTHER FOO.md)"),
-            ("[[bar.jpg]]", "[bar.jpg](/foo/bar.jpg)"),
-        ],
-    )
-    def test_base(self, wikilink: str, expected_link: str, index: Index) -> None:
-        assert substitute_wikilink_format(wikilink, index) == expected_link
+    def test_base(self, index: Index) -> None:
+        assert substitute_wikilink_format("[[bar.jpg]]", index) == "[bar.jpg](/foo/bar.jpg)"
 
     def test_with_prefix(self, index: Index) -> None:
         assert substitute_wikilink_format("[[bar.jpg]]", index, prefix="/prefix") == "[bar.jpg](/prefix/foo/bar.jpg)"
 
     def test_with_title(self, index: Index) -> None:
         assert substitute_wikilink_format("[[Title|bar.jpg]]", index) == "[Title](/foo/bar.jpg)"
+
+    def test_with_space(self, index: Index) -> None:
+        assert substitute_wikilink_format("[[OTHER FOO]]", index) == "[OTHER FOO](</foo/OTHER FOO.md>)"
 
 
 class TestRepairLinks:
