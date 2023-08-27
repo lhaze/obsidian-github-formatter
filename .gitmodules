@@ -1,0 +1,3 @@
+[submodule "submodule"]
+	path = showcase/submodule
+	url = git@github.com:lhaze/obsidian-github-formatter-test-submodule.git
