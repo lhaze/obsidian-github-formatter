@@ -1,3 +1,4 @@
+import json
 import typing as t
 from collections import defaultdict
 from dataclasses import dataclass
@@ -72,7 +73,7 @@ def _iterate_file_names(filepath: Path) -> t.Generator[str, None, None]:
 def _walk_path_tree(
     root: Path, current: Path, summary: Summary, file_map: FileMap, prefix: t.Tuple[TreeElements, ...] = ()
 ) -> t.Generator[IndexLine, None, None]:
-    contents = list(current.iterdir())
+    contents = sorted(current.iterdir())
     elements = [TreeElements.tee] * (len(contents) - 1) + [TreeElements.last]
     for element, path in zip(elements, contents):
         if path.is_dir():
@@ -114,7 +115,7 @@ class Index:
         return (
             f"{self.root.name}\n"
             + "\n".join(repr(line) for line in self.lines)
-            + f"\n\n{dict((f.value, c) for f, c in self.summary.items())}"  # noqa: C402
+            + f"\n\n{json.dumps(dict((f.value, c) for f, c in self.summary.items()), sort_keys=True)}"  # noqa: C402
         )
 
 
