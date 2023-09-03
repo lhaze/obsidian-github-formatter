@@ -4,8 +4,8 @@ import typing as t
 
 import click
 
-from obsidian_github_formatter.index import Index
-from obsidian_github_formatter.markdown import process_file
+from .cache import Cache
+from .links import process_file
 
 
 @click.command()
@@ -18,10 +18,15 @@ from obsidian_github_formatter.markdown import process_file
     help="Root of the repo.",
 )
 @click.argument("filenames", nargs=-1, type=click.Path(exists=True))
-def main(dry_run: bool, make_backups: bool, root: str, filenames: t.List[str]) -> None:
-    index = Index.create(dir_path=root)
+def main(dry_run: bool, make_backups: bool, root: str, filenames: t.List[str]) -> None:  # pragma: no cover
+    cache = Cache(
+        root=root,
+        dry_run=dry_run,
+        make_backups=make_backups,
+        processed_files=filenames,
+    )
     for filename in filenames:
-        process_file(filename, index, dry_run=dry_run, make_backups=make_backups)
+        process_file(filename, cache)
 
 
 if __name__ == "__main__":

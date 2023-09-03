@@ -1,5 +1,9 @@
+from unittest import mock
+
+from obsidian_github_formatter.cache import Cache
 from obsidian_github_formatter.index import Index
 from obsidian_github_formatter.links import (
+    process_file,
     repair_links,
     substitute_wikilink_format,
 )
@@ -28,3 +32,56 @@ class TestRepairLinks:
 
     def test_with_title(self, index: Index) -> None:
         assert repair_links("foo ![[Title|bar.jpg]] baz", index) == "foo ![Title](/foo/bar.jpg) baz"
+
+
+class TestProcessFile:
+    @mock.patch("obsidian_github_formatter.links.read_file")
+    @mock.patch("obsidian_github_formatter.links._print")
+    def test_process_file_dry_run(self, _print: mock.MagicMock, read_file: mock.MagicMock, cache: Cache) -> None:
+        cache.add_vales(dry_run=True)
+        read_file.return_value = "\n".join(
+            (
+                "FOO BAR",
+                "foo [[OTHER FOO]] bar!",
+            )
+        )
+        process_file("foo/bar.md", cache)
+        assert _print.call_args_list[0][0] == (
+            "\x1b[33mFile 'foo/bar.md' would be modified. Here's the diff:\x1b[39m",
+        )
+        assert _print.call_args_list[1][0] == (
+            "\n".join(
+                (
+                    "\x1b[31m--- ",
+                    "",
+                    "\x1b[32m+++ ",
+                    "",
+                    "\x1b[39m@@ -1,2 +1,2 @@",
+                    "",
+                    "\x1b[39m FOO BAR",
+                    "\x1b[31m-foo [[OTHER FOO]] bar!",
+                    "\x1b[32m+foo [OTHER FOO](</foo/OTHER FOO.md>) bar!",
+                )
+            ),
+        )
+
+    @mock.patch("obsidian_github_formatter.links.read_file")
+    @mock.patch("obsidian_github_formatter.links.save_file")
+    def test_process_file_wet_run(self, save_file: mock.MagicMock, read_file: mock.MagicMock, cache: Cache) -> None:
+        read_file.return_value = "\n".join(
+            (
+                "FOO BAR",
+                "foo [[OTHER FOO]] bar!",
+            )
+        )
+        process_file("foo/bar.md", cache)
+        save_file.assert_called_once_with(
+            "foo/bar.md",
+            "\n".join(
+                (
+                    "FOO BAR",
+                    "foo [OTHER FOO](</foo/OTHER FOO.md>) bar!",
+                )
+            ),
+            make_backups=False,
+        )

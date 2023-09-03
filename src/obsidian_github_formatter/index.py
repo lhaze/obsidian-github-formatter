@@ -5,6 +5,11 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
+from .cache import (
+    Cache,
+    cached,
+)
+
 
 class TreeElements(Enum):
     space = ". . "
@@ -101,28 +106,26 @@ class Index:
     file_map: FileMap
     summary: Summary
 
-    @classmethod
-    def create(
-        cls,
-        dir_path: t.Union[Path, str],
-    ) -> "Index":
-        dir_path = Path(dir_path)
-        summary = defaultdict(int)
-        file_map = defaultdict(list)
-
-        return cls(
-            root=dir_path,
-            lines=tuple(_walk_path_tree(dir_path, dir_path, summary, file_map)),
-            summary=summary,
-            file_map=file_map,
-        )
-
     def __repr__(self) -> str:
         return (
-            f"{self.root.name}\n"
-            + "\n".join(repr(line) for line in self.lines)
-            + f"\n\n{json.dumps(dict((f.value, c) for f, c in self.summary.items()), sort_keys=True)}"  # noqa: C402
+            f"{self.root.name if self.root else ''}\n"
+            + "\n".join(repr(line) for line in (self.lines or []))
+            + f"\n\n{json.dumps(dict((f.value, c) for f, c in (self.summary or {}).items()), sort_keys=True)}"  # noqa: C402
         )
+
+
+@cached
+def build_index(cache: Cache) -> Index:
+    dir_path = Path(cache.get_value("root"))
+    summary = defaultdict(int)
+    file_map = defaultdict(list)
+
+    return Index(
+        root=dir_path,
+        lines=tuple(_walk_path_tree(dir_path, dir_path, summary, file_map)),
+        summary=summary,
+        file_map=file_map,
+    )
 
 
 def render_doc_link(path: Path) -> str:
@@ -163,14 +166,9 @@ def render_index_line(line: IndexLine, root: t.Optional[Path] = None) -> str:
     return "".join(e.value for e in line.elements) + render_doc_link(doc_link)
 
 
-def render(index: Index) -> str:
+def render_index(index: Index) -> str:
     return INDEX_TEMPLATE.format(
         dir_name=index.root.name,
         rendered_index="\n".join(render_index_line(line, index.root) for line in index.lines),
         rendered_summary=render_summary(index.summary),
     )
-
-
-def build_index(path: str) -> str:
-    index = Index.create(path)
-    return render(index)

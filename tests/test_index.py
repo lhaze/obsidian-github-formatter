@@ -4,23 +4,22 @@ from pathlib import Path
 import pytest
 
 from obsidian_github_formatter.index import (
+    Cache,
     FileFormat,
-    Index,
     IndexLine,
 )
 from obsidian_github_formatter.index import TreeElements as TE
 from obsidian_github_formatter.index import (
     build_index,
     render_doc_link,
+    render_index,
     render_index_line,
     render_summary,
 )
 
-from . import _test_stub_path
 
-
-def test_index() -> None:
-    assert repr(Index.create(_test_stub_path)) == "\n".join(
+def test_index(cache: Cache) -> None:
+    assert repr(build_index(cache)) == "\n".join(
         (
             "showcase",
             "├──  bar",
@@ -98,7 +97,7 @@ def test_render_summary() -> None:
     assert render_summary(summary) == expected
 
 
-def test_build_index() -> None:
+def test_render_index(cache: Cache) -> None:
     expected = "\n".join(
         (
             "",
@@ -134,12 +133,13 @@ def test_build_index() -> None:
             "",
         )
     )
-    actual = build_index(str(_test_stub_path))
+    index = build_index(cache)
+    actual = render_index(index)
     assert actual == expected
 
 
-def test_file_map() -> None:
-    assert Index.create(_test_stub_path).file_map == {
+def test_file_map(cache: Cache) -> None:
+    assert build_index(cache).file_map == {
         "OTHER FOO": [Path("foo/OTHER FOO.md")],
         "OTHER FOO.md": [Path("foo/OTHER FOO.md")],
         "bar_file": [Path("bar/bar_file.md")],

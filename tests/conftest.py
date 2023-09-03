@@ -2,7 +2,12 @@ from pathlib import Path
 
 import pytest
 
-from obsidian_github_formatter.index import Index
+from obsidian_github_formatter.index import (
+    Cache,
+    Index,
+)
+
+from . import _test_stub_path
 
 
 @pytest.fixture(scope="session")
@@ -21,4 +26,13 @@ def index() -> Index:
         root=None,  # type: ignore
         lines=None,  # type: ignore
         summary=None,  # type: ignore
+    )
+
+
+@pytest.fixture
+def cache() -> Cache:
+    return Cache(
+        dry_run=False,
+        make_backups=False,
+        root=_test_stub_path,
     )

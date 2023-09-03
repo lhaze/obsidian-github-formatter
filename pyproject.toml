@@ -21,8 +21,7 @@ flake8 = "^5.0.4"
 black = { version = "^22.8.0", allow-prereleases = true }
 
 [tool.poetry.scripts]
-ogf = 'obsidian_github_formatter.precommit_hook_markdown:main'
-ogf-markdown = 'obsidian_github_formatter.markdown:main'
+ogf-links = 'obsidian_github_formatter.links_hook:main'
 
 [build-system]
 requires = ["poetry-core"]
@@ -50,6 +49,7 @@ exclude = '''
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
+fail_under = 90
 exclude_lines = [
   # Have to re-enable the standard pragma
   "pragma: no cover",
@@ -66,7 +66,7 @@ exclude_lines = [
 
 [tool.coverage.run]
 source = ["src"]
-omit = ["tests/*"]
+omit = ["tests/*", "src/**/*_hook.py"]
 
 [tool.isort]
 profile = "black"
