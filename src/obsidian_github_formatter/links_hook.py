@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import typing as t
+from pathlib import Path
 
 import click
 
@@ -14,7 +15,7 @@ from .links import process_file
 @click.option(
     "--root",
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
-    default=os.getcwd(),
+    default=Path(os.getcwd()),
     help="Root of the repo.",
 )
 @click.argument("filenames", nargs=-1, type=click.Path(exists=True))

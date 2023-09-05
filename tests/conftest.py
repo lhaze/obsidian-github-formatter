@@ -21,7 +21,7 @@ def index() -> Index:
             "baz.txt": [Path("bar/bar baz/baz.txt")],
             "foo": [Path("foo/foo.md"), Path("bar/foo.md")],
             "foo.md": [Path("foo/foo.md"), Path("bar/foo.md")],
-            "other baz.png": [Path("bar/bar baz/other baz.png")],
+            "other baz.png": [Path("submodule/bar/bar baz/other baz.png")],
         },
         root=None,  # type: ignore
         lines=None,  # type: ignore
@@ -30,9 +30,10 @@ def index() -> Index:
 
 
 @pytest.fixture
-def cache() -> Cache:
+def cache(index: Index) -> Cache:
     return Cache(
         dry_run=False,
         make_backups=False,
         root=_test_stub_path,
+        build_index=index,
     )

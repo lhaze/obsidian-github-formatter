@@ -6,6 +6,7 @@ Cached = t.Callable[["Cache"], DataType]
 
 class Cache(t.Generic[DataType]):
     _functions: t.ClassVar[t.Dict[str, Cached]] = {}
+    _sentinel_value: t.ClassVar[object] = object()
 
     def __init__(self, **initial: DataType) -> None:
         self._values: t.Dict[str, DataType] = initial
@@ -39,17 +40,22 @@ class Cache(t.Generic[DataType]):
             return registering_decorator(function)
         return registering_decorator
 
-    def get_value(self, target: t.Union[str, t.Callable]) -> DataType:
+    def get_value(
+        self, target: t.Union[str, t.Callable], default: DataType = _sentinel_value  # type: ignore
+    ) -> DataType:
         function_name = target if isinstance(target, str) else target.__qualname__
         if function_name not in self._values and function_name not in self._functions:
-            raise ValueError(
-                f"No value '{target}' to get. Values: {set(self._values)}. Functions: {set(self._functions)}"
-            )
+            if default is not self._sentinel_value:
+                return default
+            else:
+                raise ValueError(
+                    f"No value '{target}' to get. Values: {set(self._values)}. Functions: {set(self._functions)}"
+                )
         if function_name not in self._values:
             self._values[function_name] = self._functions[function_name](self)
         return self._values[function_name]
 
-    def add_vales(self, **values: DataType) -> None:
+    def add_values(self, **values: DataType) -> None:
         self._values.update(values)
 
     def reset(self, target: t.Union[str, t.Callable]) -> bool:

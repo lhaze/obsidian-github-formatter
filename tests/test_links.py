@@ -1,7 +1,6 @@
 from unittest import mock
 
 from obsidian_github_formatter.cache import Cache
-from obsidian_github_formatter.index import Index
 from obsidian_github_formatter.links import (
     process_file,
     repair_links,
@@ -10,35 +9,42 @@ from obsidian_github_formatter.links import (
 
 
 class TestSubstituteWikilinkFormat:
-    def test_base(self, index: Index) -> None:
-        assert substitute_wikilink_format("[[bar.jpg]]", index) == "[bar.jpg](/foo/bar.jpg)"
+    def test_base(self, cache: Cache) -> None:
+        assert substitute_wikilink_format("[[bar.jpg]]", cache) == "[bar.jpg](/foo/bar.jpg)"
 
-    def test_with_prefix(self, index: Index) -> None:
-        assert substitute_wikilink_format("[[bar.jpg]]", index, prefix="/prefix") == "[bar.jpg](/prefix/foo/bar.jpg)"
+    def test_with_prefix(self, cache: Cache) -> None:
+        cache.add_values(link_prefix="/prefix")
+        assert substitute_wikilink_format("[[bar.jpg]]", cache) == "[bar.jpg](/prefix/foo/bar.jpg)"
 
-    def test_with_title(self, index: Index) -> None:
-        assert substitute_wikilink_format("[[Title|bar.jpg]]", index) == "[Title](/foo/bar.jpg)"
+    def test_with_title(self, cache: Cache) -> None:
+        assert substitute_wikilink_format("[[Title|bar.jpg]]", cache) == "[Title](/foo/bar.jpg)"
 
-    def test_with_space(self, index: Index) -> None:
-        assert substitute_wikilink_format("[[OTHER FOO]]", index) == "[OTHER FOO](</foo/OTHER FOO.md>)"
+    def test_with_space(self, cache: Cache) -> None:
+        assert substitute_wikilink_format("[[OTHER FOO]]", cache) == "[OTHER FOO](</foo/OTHER FOO.md>)"
+
+    def test_in_submodule(self, cache: Cache) -> None:
+        assert substitute_wikilink_format("[[other baz.png]]", cache) == (
+            "[other baz.png]"
+            "(<https://raw.githubusercontent.com/lhaze/obsidian-github-formatter-test-submodule/master/bar/bar baz/other baz.png>)"
+        )
 
 
 class TestRepairLinks:
-    def test_md(self, index: Index) -> None:
-        assert repair_links("foo [[bar_file]] baz", index) == "foo [bar_file](/bar/bar_file.md) baz"
+    def test_md(self, cache: Cache) -> None:
+        assert repair_links("foo [[bar_file]] baz", cache) == "foo [bar_file](/bar/bar_file.md) baz"
 
-    def test_image(self, index: Index) -> None:
-        assert repair_links("foo ![[bar.jpg]] baz", index) == "foo ![bar.jpg](/foo/bar.jpg) baz"
+    def test_image(self, cache: Cache) -> None:
+        assert repair_links("foo ![[bar.jpg]] baz", cache) == "foo ![bar.jpg](/foo/bar.jpg) baz"
 
-    def test_with_title(self, index: Index) -> None:
-        assert repair_links("foo ![[Title|bar.jpg]] baz", index) == "foo ![Title](/foo/bar.jpg) baz"
+    def test_with_title(self, cache: Cache) -> None:
+        assert repair_links("foo ![[Title|bar.jpg]] baz", cache) == "foo ![Title](/foo/bar.jpg) baz"
 
 
 class TestProcessFile:
     @mock.patch("obsidian_github_formatter.links.read_file")
     @mock.patch("obsidian_github_formatter.links._print")
     def test_process_file_dry_run(self, _print: mock.MagicMock, read_file: mock.MagicMock, cache: Cache) -> None:
-        cache.add_vales(dry_run=True)
+        cache.add_values(dry_run=True)
         read_file.return_value = "\n".join(
             (
                 "FOO BAR",
