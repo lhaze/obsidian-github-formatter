@@ -1,5 +1,5 @@
 - foo [[bar_file]] baz!
 - [[OTHER FOO]]
-- quax
+- [[quax|bar_file]]
 
 ![[example_image.svg]]
