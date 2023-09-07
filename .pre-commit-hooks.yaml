@@ -1,6 +1,6 @@
--   id: obsidian-github-formatter-links
-    name: OGF -- Repository formatter for matchinig Obsidian Vault and GitHub Web browser; repair wikilinks
-    entry: ogf-links
+-   id: ogf-repair-wikilinks
+    name: OGF -- repair wikilinks
+    entry: ogf-repair-wikilinks
     language: python
     files: \.md$
     types: [file]

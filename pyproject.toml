@@ -21,7 +21,7 @@ flake8 = "^5.0.4"
 black = { version = "^22.8.0", allow-prereleases = true }
 
 [tool.poetry.scripts]
-ogf-links = 'obsidian_github_formatter.links_hook:main'
+ogf-repair-wikilinks = 'obsidian_github_formatter.repair_wikilinks_hook:main'
 
 [build-system]
 requires = ["poetry-core"]
