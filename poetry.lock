@@ -480,6 +480,18 @@ files = [
 ]
 
 [[package]]
+name = "pca-errors"
+version = "0.2.0"
+description = "Declarative, parametrizable & L10n-independent errors for python-clean-architecture."
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "pca-errors-0.2.0.tar.gz", hash = "sha256:ce0220f0862c6f3ed5bb82646286d640132e63a292a7fae13b8a6c4c3010ab6e"},
+    {file = "pca_errors-0.2.0-py3-none-any.whl", hash = "sha256:9360938149d490df7d338461f883a34baa9884d6aea8642cd007f6faaf10ea24"},
+]
+
+[[package]]
 name = "pdbpp"
 version = "0.10.3"
 description = "pdb++, a drop-in replacement for pdb"
@@ -949,4 +961,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "ca73298b4790980a461de5fb985935cd7017700f8cd02eb9e6e3a068b7f7b7b6"
+content-hash = "4c63cbe25bf51a4315a971ee83d374cdd0cf842039c178a7cdd63ba744e5a6dd"

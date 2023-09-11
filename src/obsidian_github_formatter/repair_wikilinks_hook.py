@@ -2,10 +2,13 @@
 import os
 import typing as t
 from pathlib import Path
+from pprint import pprint
 
 import click
 
 from .cache import Cache
+from .console import color_header
+from .errors import Errors
 from .links import process_file
 
 
@@ -21,7 +24,7 @@ from .links import process_file
     help="Root of the repo.",
 )
 @click.argument("filenames", nargs=-1, type=click.Path(exists=True))
-def main(dry_run: bool, make_backups: bool, root: str, filenames: t.List[str]) -> None:  # pragma: no cover
+def main(dry_run: bool, make_backups: bool, root: str, filenames: t.List[str]) -> int:  # pragma: no cover
     """Repairs wikilinks -- changes [[link]] link format to [link](link).
 
 
@@ -39,7 +42,13 @@ def main(dry_run: bool, make_backups: bool, root: str, filenames: t.List[str]) -
     )
     for filename in filenames:
         process_file(filename, cache)
+    errors: Errors = cache.get_value("get_errors")
+    if errors:
+        print(color_header("Errors found!\n"))
+        for error in errors:
+            pprint(error.to_dict())
+    return 1 if errors else 0
 
 
 if __name__ == "__main__":
-    main()  # type: ignore
+    raise SystemExit(main())  # type: ignore
