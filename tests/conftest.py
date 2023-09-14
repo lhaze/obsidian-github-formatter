@@ -34,6 +34,6 @@ def cache(index: Index) -> Cache:
     return Cache(
         dry_run=False,
         make_backups=False,
-        root=_test_stub_path,
+        vault_root=_test_stub_path,
         build_index=index,
     )

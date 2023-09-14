@@ -66,11 +66,11 @@ def substitute_wikilink_format(contents: str, cache: Cache) -> str:
 
     link = contents.strip("[]")
     if "|" in contents:
-        title, link = link.rsplit("|", 1)
+        link, title = link.rsplit("|", 1)
     else:
         title = None
     paths = index.file_map.get(link, None)
-    if paths is None:
+    if paths is None:  # pragma: no cover
         errors.append(LinksErrors.TargetNotFound(target=link, title=title, file=str(processed_file.filepath)))
         return contents
     if len(paths) > 1:  # pragma: no cover
@@ -93,7 +93,7 @@ def substitute_wikilink_format(contents: str, cache: Cache) -> str:
 
 def _substitute_submodules(cache: Cache, path: Path) -> t.Optional[str]:
     submodules: t.Dict[Path, Submodule] = cache.get_value(get_submodules)
-    root: Path = cache.get_value("root")
+    root: Path = cache.get_value("vault_root")
 
     for submodule in submodules:
         assert isinstance(submodule, Submodule)

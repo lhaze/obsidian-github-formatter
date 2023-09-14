@@ -17,7 +17,7 @@ class TestSubstituteWikilinkFormat:
         assert substitute_wikilink_format("[[bar.jpg]]", cache) == "[bar.jpg](/prefix/foo/bar.jpg)"
 
     def test_with_title(self, cache: Cache) -> None:
-        assert substitute_wikilink_format("[[Title|bar.jpg]]", cache) == "[Title](/foo/bar.jpg)"
+        assert substitute_wikilink_format("[[bar.jpg|Title]]", cache) == "[Title](/foo/bar.jpg)"
 
     def test_with_space(self, cache: Cache) -> None:
         assert substitute_wikilink_format("[[OTHER FOO]]", cache) == "[OTHER FOO](</foo/OTHER FOO.md>)"
@@ -37,7 +37,7 @@ class TestRepairLinks:
         assert repair_links("foo ![[bar.jpg]] baz", cache) == "foo ![bar.jpg](/foo/bar.jpg) baz"
 
     def test_with_title(self, cache: Cache) -> None:
-        assert repair_links("foo ![[Title|bar.jpg]] baz", cache) == "foo ![Title](/foo/bar.jpg) baz"
+        assert repair_links("foo ![[bar.jpg|Title]] baz", cache) == "foo ![Title](/foo/bar.jpg) baz"
 
 
 class TestProcessFile:

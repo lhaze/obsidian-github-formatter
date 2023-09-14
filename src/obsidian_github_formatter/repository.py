@@ -14,7 +14,7 @@ _GITHUB_FILE_URL_PATTERN = "https://raw.githubusercontent.com/{repo}/{branch}/{f
 
 @cached
 def get_repo_root(cache: Cache) -> Path:
-    root: Path = cache.get_value("root")
+    root: Path = cache.get_value("vault_root")
     if not (root / ".git").exists():
         root = root.parent
     return root.resolve()

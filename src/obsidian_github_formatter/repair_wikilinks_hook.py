@@ -19,9 +19,10 @@ from .links import process_file
 @click.option("--make-backups", "-b", is_flag=True, help="Copies the backfile before changes are to be mmade.")
 @click.option(
     "--root",
+    "-r",
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
     default=Path(os.getcwd()),
-    help="Root of the repo.",
+    help="Root of the vault (it may not be the same as root of the repo).",
 )
 @click.argument("filenames", nargs=-1, type=click.Path(exists=True))
 def main(dry_run: bool, make_backups: bool, root: str, filenames: t.List[str]) -> int:  # pragma: no cover
@@ -34,8 +35,8 @@ def main(dry_run: bool, make_backups: bool, root: str, filenames: t.List[str]) -
 
     * Supports submodules: changes [[link]] to a link [link](https://raw.githubusercontent.com/.../link), based on `.gitmodules` config file.
     """
-    cache = Cache(
-        root=root,
+    cache = Cache[t.Any](
+        vault_root=Path(root),
         dry_run=dry_run,
         make_backups=make_backups,
         processed_files=filenames,
@@ -44,7 +45,7 @@ def main(dry_run: bool, make_backups: bool, root: str, filenames: t.List[str]) -
         process_file(filename, cache)
     errors: Errors = cache.get_value("get_errors")
     if errors:
-        print(color_header("Errors found!\n"))
+        print(color_header("Errors found: ") + f"{', '.join(filenames)}")
         for error in errors:
             pprint(error.to_dict())
     return 1 if errors else 0

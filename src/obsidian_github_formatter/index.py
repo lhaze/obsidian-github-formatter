@@ -116,7 +116,7 @@ class Index:
 
 @cached
 def build_index(cache: Cache) -> Index:
-    dir_path = Path(cache.get_value("root"))
+    dir_path = Path(cache.get_value("vault_root"))
     summary = defaultdict(int)
     file_map = defaultdict(list)
 

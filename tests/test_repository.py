@@ -9,7 +9,7 @@ from . import _test_stub_path
 
 
 def test_get_repo_root(cache: Cache) -> None:
-    cache.add_values(root=_test_stub_path)
+    cache.add_values(vault_root=_test_stub_path)
     assert get_repo_root(cache) == (_test_stub_path / "..").resolve()
 
 
