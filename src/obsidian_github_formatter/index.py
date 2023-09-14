@@ -9,6 +9,7 @@ from .cache import (
     Cache,
     cached,
 )
+from .files import FileFormat
 
 
 class TreeElements(Enum):
@@ -19,41 +20,6 @@ class TreeElements(Enum):
 
     def __repr__(self) -> str:
         return f"TreeElements.{self.name}"
-
-
-class FileFormat(Enum):
-    directory = "directories"
-    markdown = "markdown"
-    image = "image"
-    audio = "audio"
-    video = "video"
-    pdf = "pdf"
-    other = "other"
-
-    @classmethod
-    def from_extension(cls, extension: t.Optional[str]) -> t.Optional["FileFormat"]:
-        map = {
-            ".3gp": cls.audio,
-            ".bmp": cls.image,
-            ".flac": cls.audio,
-            ".gif": cls.image,
-            ".jpeg": cls.image,
-            ".jpg": cls.image,
-            ".m4a": cls.audio,
-            ".md": cls.markdown,
-            ".mkv": cls.video,
-            ".mov": cls.video,
-            ".mp3": cls.audio,
-            ".mp4": cls.video,
-            ".ogg": cls.audio,
-            ".ogv": cls.video,
-            ".pdf": cls.pdf,
-            ".png": cls.image,
-            ".svg": cls.image,
-            ".wav": cls.audio,
-            ".webm": cls.video,
-        }
-        return map.get((extension or "").lower(), cls.other)
 
 
 @dataclass(frozen=True)
@@ -96,13 +62,13 @@ def _walk_path_tree(
             yield IndexLine(prefix + (element,), path)
             for file_name in _iterate_file_names(path):
                 file_map[file_name].append(path.relative_to(root))
-            summary[FileFormat.from_extension(path.suffix)] += 1  # type: ignore
+            summary[FileFormat.from_path(path)] += 1  # type: ignore
 
 
 @dataclass(frozen=True)
 class Index:
     root: Path
-    lines: t.Tuple[IndexLine]
+    lines: t.Tuple[IndexLine, ...]
     file_map: FileMap
     summary: Summary
 

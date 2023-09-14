@@ -2,13 +2,15 @@
 import os
 import typing as t
 from pathlib import Path
-from pprint import pprint
 
 import click
 
 from .cache import Cache
 from .console import color_header
-from .errors import Errors
+from .errors import (
+    Errors,
+    Notifications,
+)
 from .links import process_file
 
 
@@ -45,9 +47,13 @@ def main(dry_run: bool, make_backups: bool, root: str, filenames: t.List[str]) -
         process_file(filename, cache)
     errors: Errors = cache.get_value("get_errors")
     if errors:
-        print(color_header("Errors found: ") + f"{', '.join(filenames)}")
+        print(color_header("\nErrors found: ") + f"{', '.join(filenames)}")
         for error in errors:
-            pprint(error.to_dict())
+            print(f"{error.code}: {', '.join(f'{k}={v}' for k, v in error.kwargs.items())}")
+    notifications: Notifications = cache.get_value("get_notifications")
+    if notifications:
+        print(color_header("\nInfo: ") + f"{', '.join(filenames)}")
+        print("\n".join(notifications))
     return 1 if errors else 0
 
 
