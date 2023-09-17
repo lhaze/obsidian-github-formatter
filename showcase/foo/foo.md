@@ -1,7 +1,7 @@
-- foo [[bar_file]] baz!
-- [[OTHER FOO]]
-- [[quax|bar_file]]
-- ![[example_image.svg]]
-- [[non-existent]]
-- [[non-existent.jpg]]
-- [[foo]]
+- foo [bar_file](/showcase/bar/bar_file.md) baz!
+- [OTHER FOO](</showcase/foo/OTHER FOO.md>)
+- [[quax|bar_file|bar_file ❌]]
+- ![example_image.svg](https://github.com/lhaze/obsidian-github-formatter-test-submodule/raw/master/example_image.svg)
+- [[non-existent|non-existent ❌]]
+- [[non-existent.jpg|non-existent.jpg ❌]]
+- [[foo|foo ↔]]
