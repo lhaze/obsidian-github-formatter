@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "obsidian-github-formatter"
-version = "0.1.0"
+version = "0.1.1"
 description = "Utility tool to reformat markdown files of an Obsidian Vault to be naturally readable via GitHub Web."
 authors = ["lhaze <github@lhaze.name>"]
 license = "MIT License"
