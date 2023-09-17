@@ -25,7 +25,7 @@ class TestSubstituteWikilinkFormat:
     def test_in_submodule(self, cache: Cache) -> None:
         assert substitute_wikilink_format("[[other baz.png]]", cache) == (
             "[other baz.png]"
-            "(<https://raw.githubusercontent.com/lhaze/obsidian-github-formatter-test-submodule/master/bar/bar baz/other baz.png>)"
+            "(<https://github.com/lhaze/obsidian-github-formatter-test-submodule/raw/master/bar/bar baz/other baz.png>)"
         )
 
 

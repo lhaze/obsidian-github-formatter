@@ -9,7 +9,7 @@ from .cache import (
     cached,
 )
 
-_GITHUB_FILE_URL_PATTERN = "https://raw.githubusercontent.com/{repo}/{branch}/{filepath}"
+_GITHUB_FILE_URL_PATTERN = "https://github.com/{repo}/raw/{ref}/{filepath}"
 
 
 @cached
@@ -35,7 +35,7 @@ class Submodule:
 
     def substitute(self, filepath: Path) -> str:
         relative_filepath = filepath.relative_to(self.path)
-        return _GITHUB_FILE_URL_PATTERN.format(repo=self.repo, branch="master", filepath=str(relative_filepath))
+        return _GITHUB_FILE_URL_PATTERN.format(repo=self.repo, ref="master", filepath=str(relative_filepath))
 
 
 @cached
