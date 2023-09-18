@@ -32,8 +32,10 @@ def index() -> Index:
 @pytest.fixture
 def cache(index: Index) -> Cache:
     return Cache(
+        verbosity=1,
+        vault_root=_test_stub_path,
         dry_run=False,
         make_backups=False,
-        vault_root=_test_stub_path,
         build_index=index,
+        processed_files=(Path("foo.md"),),
     )

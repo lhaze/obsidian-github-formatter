@@ -9,7 +9,10 @@ from .cache import (
     Cache,
     cached,
 )
-from .files import FileFormat
+from .files import (
+    FileFormat,
+    filter_out_filepaths,
+)
 
 
 class TreeElements(Enum):
@@ -41,17 +44,13 @@ def _iterate_file_names(filepath: Path) -> t.Generator[str, None, None]:
         yield filepath.stem
 
 
-def _filter_out_filepaths(filepath: Path) -> bool:
-    return filepath.name.startswith(".")
-
-
 def _walk_path_tree(
     root: Path, current: Path, summary: Summary, file_map: FileMap, prefix: t.Tuple[TreeElements, ...] = ()
 ) -> t.Generator[IndexLine, None, None]:
     contents = sorted(current.iterdir())
     elements = [TreeElements.tee] * (len(contents) - 1) + [TreeElements.last]
     for element, path in zip(elements, contents):
-        if _filter_out_filepaths(path):
+        if filter_out_filepaths(path):
             continue
         elif path.is_dir():
             yield IndexLine(prefix + (element,), path)

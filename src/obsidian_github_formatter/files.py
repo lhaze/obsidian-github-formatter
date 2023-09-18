@@ -13,20 +13,37 @@ from .cache import (
 _BACKUP_EXTENSION = "~"
 
 
-def read_file(filename: str) -> str:  # pragma: no cover
+def read_file(filename: Path) -> str:  # pragma: no cover
     with open(filename, "r") as f:
         return f.read()
 
 
-def save_file(filepath: t.Union[str, Path], contents: str, make_backups: bool = False) -> None:  # pragma: no cover
+def save_file(path: Path, contents: str, make_backups: bool = False) -> None:  # pragma: no cover
     if make_backups:
-        shutil.copyfile(str(filepath), f"{str(filepath)}.{_BACKUP_EXTENSION}")
-    with open(filepath, "w") as f:
+        shutil.copyfile(str(path), f"{str(path)}.{_BACKUP_EXTENSION}")
+    with open(path, "w") as f:
         f.write(contents)
 
 
 def diff_files(text_a: str, text_b: str) -> t.Iterator[str]:
     return difflib.unified_diff(text_a.splitlines(), text_b.splitlines())
+
+
+def filter_out_filepaths(filepath: Path) -> bool:
+    return filepath.name.startswith(".")
+
+
+def expand_dir(current: Path) -> t.Generator[Path, None, None]:
+    if not current.is_dir():
+        yield current
+        return
+    contents = sorted(current.iterdir())
+    for path in contents:
+        if not filter_out_filepaths(path):
+            if path.is_dir():
+                yield from expand_dir(path)
+            elif FileFormat.markdown == FileFormat.from_path(path):
+                yield path
 
 
 class FileFormat(Enum):

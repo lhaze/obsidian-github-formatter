@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest import mock
 
 from obsidian_github_formatter.cache import Cache
@@ -51,9 +52,9 @@ class TestProcessFile:
                 "foo [[OTHER FOO]] bar!",
             )
         )
-        process_file("foo/bar.md", cache)
+        process_file(Path("foo/bar.md"), cache)
         assert _print.call_args_list[0][0] == (
-            "\x1b[33mFile 'foo/bar.md' would be modified. Here's the diff:\x1b[39m",
+            "\x1b[33m\n\nFile 'foo/bar.md' would be modified. Here's the diff:\x1b[39m",
         )
         assert _print.call_args_list[1][0] == (
             "\n".join(
@@ -80,9 +81,9 @@ class TestProcessFile:
                 "foo [[OTHER FOO]] bar!",
             )
         )
-        process_file("foo/bar.md", cache)
+        process_file(Path("foo/bar.md"), cache)
         save_file.assert_called_once_with(
-            "foo/bar.md",
+            Path("foo/bar.md"),
             "\n".join(
                 (
                     "FOO BAR",
